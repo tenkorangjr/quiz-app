@@ -4,7 +4,6 @@ from ui import QuizInterface
 import requests
 
 quizzler_data = requests.get(url="https://opentdb.com/api.php?amount=10&type=boolean")
-print(quizzler_data.json())
 question_data = quizzler_data.json()["results"]
 
 question_bank = []

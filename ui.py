@@ -2,7 +2,7 @@ from tkinter import *
 from quiz_brain import QuizBrain
 import time
 
-THEME_COLOR = "#375362"
+BACKGROUND = "#375362"
 
 
 class QuizInterface:
@@ -11,10 +11,13 @@ class QuizInterface:
         self.quiz = quiz_brain
 
         self.window = Tk()
-        self.window.title("Quizzler App")
-        self.window.config(padx=20, pady=20, bg=THEME_COLOR)
+        self.window.title("Quiz App")
+        self.window.config(padx=20, pady=20, bg=BACKGROUND)
 
-        self.score_label = Label(pady=20, fg="white", text=f"Score: {self.quiz.score}", bg=THEME_COLOR)
+        self.timer_label = Label(fg="white", text=f"Time Left: {self.quiz.timer}s", bg=BACKGROUND)
+        self.timer_label.grid(row=0, column=0)
+
+        self.score_label = Label(pady=20, fg="white", text=f"Score: {self.quiz.score}", bg=BACKGROUND)
         self.score_label.grid(row=0, column=1)
 
         self.canvas = Canvas(width=300, height=250, bg="white")
@@ -34,6 +37,7 @@ class QuizInterface:
         self.correct_button.grid(column=0, row=2, pady=20)
 
         self.ui_next_question()
+        self.count_down()
 
         self.window.mainloop()
 
@@ -70,4 +74,19 @@ class QuizInterface:
         self.canvas.config(bg="white")
         self.window.update()
 
+    def count_down(self):
+        if self.quiz.timer > 0:
+            for _ in range(5):  # To update the screen every 0.2 seconds
+                time.sleep(0.2)
+                self.window.update()
+            self.quiz.timer -= 1
+            self.timer_label.config(text=f"Time Left: {self.quiz.timer}s")
+            self.count_down()
+        else:
+            self.give_feedback(False)
+            self.ui_next_question()
+            self.quiz.timer = 15
+            self.timer_label.config(text=f"Time Left: {self.quiz.timer}s")
+            self.window.update()
+            self.count_down()
 
