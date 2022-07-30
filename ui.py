@@ -1,6 +1,7 @@
 from tkinter import *
 from quiz_brain import QuizBrain
 import time
+from tkinter import messagebox
 
 BACKGROUND = "#375362"
 
@@ -9,6 +10,7 @@ class QuizInterface:
 
     def __init__(self, quiz_brain: QuizBrain):
         self.quiz = quiz_brain
+        self.count = True
 
         self.window = Tk()
         self.window.title("Quiz App")
@@ -58,10 +60,13 @@ class QuizInterface:
             self.canvas.itemconfig(self.question, text="You've reached the maximum number of questions")
             self.cross_button.config(state="disabled")
             self.correct_button.config(state="disabled")
+            self.count = False
+            messagebox.showinfo(message=f"Thank you for playing :) \n\n Your score was {self.quiz.score}")
         elif self.quiz.still_has_questions():
             self.give_feedback(self.quiz.check_answer(string))
             self.ui_next_question()
             self.score_label.config(text=f"Score: {self.quiz.score}")
+            self.reset_count_down()
 
     def give_feedback(self, is_right):
         if is_right:
@@ -75,18 +80,24 @@ class QuizInterface:
         self.window.update()
 
     def count_down(self):
-        if self.quiz.timer > 0:
+        if self.quiz.timer > 0 and self.count:
             for _ in range(5):  # To update the screen every 0.2 seconds
                 time.sleep(0.2)
                 self.window.update()
             self.quiz.timer -= 1
             self.timer_label.config(text=f"Time Left: {self.quiz.timer}s")
             self.count_down()
-        else:
+        elif self.count:
             self.give_feedback(False)
             self.ui_next_question()
-            self.quiz.timer = 15
+            self.reset_count_down()
+        else:
+            self.quiz.timer = 0
             self.timer_label.config(text=f"Time Left: {self.quiz.timer}s")
-            self.window.update()
-            self.count_down()
+
+    def reset_count_down(self):
+        self.quiz.timer = 15
+        self.timer_label.config(text=f"Time Left: {self.quiz.timer}s")
+        self.window.update()
+        self.count_down()
 
